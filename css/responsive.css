@@ -1,0 +1,40 @@
+/* ============ RESPONSIVE ============ */
+@media (max-width: 860px){
+  .sidebar{
+    width:78vw;
+    max-width:300px;
+    transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(0.4,0,0.2,1);
+  }
+  body.sidebar-open .sidebar{ transform:translateX(0); }
+  body.sidebar-collapsed .sidebar{ transform:translateX(-100%); opacity:1; }
+
+  .main{
+    margin-left:0;
+    width:100%;
+    transition:none;
+  }
+  body.sidebar-collapsed .main{
+    margin-left:0;
+    width:100%;
+  }
+
+  #openSidebar{ display:flex !important; }
+
+  .thread-badge{ padding:0; width:20px; height:20px; justify-content:center; border:none; background:transparent; }
+  .thread-badge .thread-dot{ width:8px; height:8px; }
+  #threadBadgeLabel{ display:none; }
+
+  .sidebar-scrim{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.3);
+    z-index:50;
+  }
+  body.sidebar-open .sidebar-scrim{ display:block; }
+
+  .messages{ padding:16px 14px 30px; }
+  .composer-wrap{ padding:12px 14px 18px; }
+  .composer-box{ padding:8px 10px; gap:6px; }
+  .composer-input{ font-size:16px; padding:6px 8px 6px 0; max-height:140px; }
+}

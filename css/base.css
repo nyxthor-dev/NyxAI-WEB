@@ -1,0 +1,81 @@
+/* ============================================================
+   NykChat — Tema Claro (Optimizado)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root{
+  --bg-0:#ffffff;
+  --bg-1:#f9fafb;
+  --bg-2:#f3f4f6;
+  --bg-3:#e5e7eb;
+  --line-1:#e5e7eb;
+  --line-2:#d1d5db;
+  --text-0:#111827;
+  --text-1:#374151;
+  --text-2:#6b7280;
+  --text-3:#9ca3af;
+  --accent:#2563eb;
+  --accent-dim:#1d4ed8;
+  --accent-soft:#dbeafe;
+  --ok:#059669;
+  --err:#dc2626;
+  --radius:12px;
+  --radius-sm:8px;
+  --radius-xs:6px;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.10);
+  --transition-fast: all .12s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html{
+  -webkit-text-size-adjust:100%;
+  touch-action:manipulation;
+}
+html,body{
+  height:100%;
+  background:var(--bg-0);
+  color:var(--text-0);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+::selection{background:#bfdbfe; color:var(--text-0);}
+
+/* Eliminar highlight feo en móviles y outlines por defecto */
+*{-webkit-tap-highlight-color:transparent;}
+button,input,textarea,select,a,[role="button"],.chat-item,.model-option,.attach-option,.profile-list-item{
+  outline:none;
+  -webkit-touch-callout:none;
+}
+button::-moz-focus-inner{border:0;}
+
+/* Focus visible elegante y suave */
+*:focus-visible{
+  box-shadow:0 0 0 2px var(--accent-soft), 0 0 0 4px var(--bg-0);
+  border-radius:var(--radius-xs);
+}
+.chat-item:focus-visible,.model-option:focus-visible,.attach-option:focus-visible,.profile-list-item:focus-visible{
+  box-shadow:inset 0 0 0 2px var(--accent);
+}
+.btn-icon:focus-visible,.btn-new-chat:focus-visible,.btn-attach:focus-visible,.btn-send:focus-visible,.btn-ghost:focus-visible,.btn-primary:focus-visible,.composer:focus-within{
+  box-shadow:0 0 0 2px var(--accent);
+}
+
+/* Active state suave: nunca un cuadrado, solo un leve scale */
+button:active,.btn-icon:active,.btn-new-chat:active,.btn-attach:active,.btn-send:active,.btn-ghost:active,.btn-primary:active,.chat-item:active,.model-option:active,.attach-option:active,.profile-list-item:active{
+  transform:scale(0.97);
+  transition-duration:0.05s;
+}
+
+button{font-family:inherit; cursor:pointer; background:none; border:none; color:inherit;}
+input,textarea{font-family:inherit; color:inherit;}
+a{color:var(--accent);}
+

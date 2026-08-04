@@ -1,0 +1,53 @@
+/* ============ ACCIONES DE MENSAJE (continuar / regenerar) ============ */
+.msg-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:2px;
+}
+.msg.assistant .msg-actions{ justify-content:flex-start; }
+.btn-msg-action{
+  display:flex; align-items:center; justify-content:center;
+  width:26px; height:26px;
+  color:var(--text-3);
+  background:transparent;
+  border:1px solid var(--line-1);
+  border-radius:50%;
+  cursor:pointer;
+  transition:var(--transition-fast);
+}
+.btn-msg-action:hover{ color:var(--accent); border-color:var(--accent); background:var(--bg-2); }
+.btn-msg-action svg{ flex-shrink:0; }
+.btn-msg-action.copied{ color:var(--ok); border-color:var(--ok); }
+.btn-msg-action:disabled{ opacity:.35; cursor:not-allowed; }
+.btn-msg-action:disabled:hover{ color:var(--text-3); border-color:var(--line-1); background:transparent; }
+
+/* Acciones en mensajes de usuario (copiar / editar): alineadas a la
+   derecha, igual que la burbuja del mensaje. */
+.msg.user .msg-actions-user{ justify-content:flex-end; }
+
+/* Selector de versiones regeneradas: < 2/3 > */
+.msg-versions{
+  display:flex; align-items:center; gap:2px;
+  color:var(--text-3);
+}
+.btn-version-nav{
+  display:flex; align-items:center; justify-content:center;
+  width:22px; height:22px;
+  color:inherit;
+  background:transparent;
+  border:none;
+  border-radius:50%;
+  cursor:pointer;
+  transition:var(--transition-fast);
+}
+.btn-version-nav:hover:not(:disabled){ color:var(--accent); background:var(--bg-2); }
+.btn-version-nav:disabled{ opacity:.3; cursor:not-allowed; }
+.version-count{
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--text-3);
+  min-width:28px;
+  text-align:center;
+}
+

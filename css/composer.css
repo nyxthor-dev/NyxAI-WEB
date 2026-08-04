@@ -1,0 +1,249 @@
+/* ============ COMPOSER (UNIFICADO) ============ */
+.composer-wrap{
+  flex-shrink:0;
+  padding:16px 20px 24px;
+  border-top:1px solid var(--line-1);
+  background:var(--bg-0);
+}
+.composer{
+  max-width:800px;
+  margin:0 auto;
+  border:1px solid var(--line-1);
+  border-radius:var(--radius);
+  background:var(--bg-0);
+  box-shadow:var(--shadow-sm), 0 4px 12px rgba(0,0,0,0.04);
+  transition:border-color .15s, box-shadow .15s;
+  cursor:text;
+}
+.composer:focus-within{
+  border-color:var(--line-2);
+  box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+.composer:focus-within .composer-input{
+  border-right:1px solid var(--line-1);
+}
+
+/* Caja interna: una sola fila flexible */
+.composer-box{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  padding:10px 12px;
+}
+
+/* Textarea: sin bordes, sin fondo, ocupa todo el espacio */
+.composer-input{
+  flex:1;
+  width:100%;
+  resize:none;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:var(--text-0);
+  font-family:var(--sans);
+  font-size:16px; /* 16px previene zoom en iOS */
+  line-height:1.55;
+  max-height:160px;
+  padding:6px 10px 6px 2px;
+  -webkit-appearance:none;
+  appearance:none;
+  min-height:24px;
+  box-shadow:none;
+  overflow-y:auto;
+  border-right:1px solid var(--line-1);
+  margin-right:8px;
+}
+.composer-input::placeholder{ color:var(--text-3); }
+
+/* Botón adjuntar */
+.attach-wrap{ position:relative; flex-shrink:0; }
+.btn-attach{
+  display:flex; align-items:center; justify-content:center;
+  width:32px; height:32px;
+  border-radius:50%;
+  border:1px solid var(--line-1);
+  color:var(--text-2);
+  transition:var(--transition-fast);
+  flex-shrink:0;
+  background:transparent;
+  margin-bottom:2px;
+}
+.btn-attach:hover{ border-color:var(--line-2); color:var(--text-0); background:var(--bg-2); }
+.btn-attach.open{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+  transform:rotate(45deg);
+}
+
+.attach-menu{
+  display:none;
+  position:absolute;
+  bottom:calc(100% + 10px); left:0;
+  min-width:180px;
+  background:var(--bg-0);
+  border:1px solid var(--line-1);
+  border-radius:var(--radius-sm);
+  box-shadow:var(--shadow-lg);
+  z-index:40;
+  overflow:hidden;
+}
+.attach-menu.open{ display:block; }
+.attach-option{
+  width:100%;
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px;
+  font-family:var(--sans);
+  font-size:13px;
+  font-weight:500;
+  color:var(--text-1);
+  border-bottom:1px solid var(--line-1);
+  text-align:left;
+  transition:var(--transition-fast);
+  border:none;
+  background:transparent;
+  cursor:pointer;
+}
+.attach-option:last-child{ border-bottom:none; }
+.attach-option:hover{ background:var(--bg-1); color:var(--text-0); }
+.attach-option svg{ color:var(--text-3); flex-shrink:0; }
+.attach-option:hover svg{ color:var(--accent); }
+
+/* attachment chips */
+.attach-chips{
+  max-width:800px;
+  margin:0 auto;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:flex-start;
+}
+.attach-chips:not(:empty){ margin-bottom:10px; }
+.attach-chip-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  max-width:280px;
+}
+.attach-chip{
+  display:flex; align-items:center; gap:7px;
+  padding:5px 8px 5px 10px;
+  border:1px solid var(--line-1);
+  border-radius:20px;
+  background:var(--bg-1);
+  font-family:var(--sans);
+  font-size:12px;
+  font-weight:500;
+  color:var(--text-1);
+  max-width:280px;
+  animation:fadeUp .2s ease;
+}
+.attach-chip.error{ border-color:var(--err); background:rgba(220,38,38,0.05); }
+.attach-chip .chip-name{
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.attach-chip .chip-status{ color:var(--text-3); flex-shrink:0; }
+.attach-chip.uploading .chip-status{ color:var(--accent); }
+.attach-chip.error .chip-status{ color:var(--err); font-weight:700; }
+.attach-chip.ready .chip-status{ color:var(--ok); }
+.attach-chip-error{
+  font-family:var(--sans);
+  font-size:11px;
+  line-height:1.4;
+  color:var(--err);
+  padding:0 4px;
+  word-break:break-word;
+}
+.attach-chip-retry{
+  display:flex; align-items:center; justify-content:center;
+  width:18px; height:18px;
+  border-radius:50%;
+  color:var(--text-3);
+  flex-shrink:0;
+  transition:var(--transition-fast);
+  border:none;
+  background:transparent;
+}
+.attach-chip-retry:hover{ background:var(--bg-2); color:var(--accent); }
+.attach-chip-remove{
+  display:flex; align-items:center; justify-content:center;
+  width:18px; height:18px;
+  border-radius:50%;
+  color:var(--text-3);
+  flex-shrink:0;
+  transition:var(--transition-fast);
+  border:none;
+  background:transparent;
+}
+.attach-chip-remove:hover{ background:var(--bg-2); color:var(--err); }
+.attach-chip-thumb{
+  width:16px; height:16px;
+  border-radius:3px;
+  object-fit:cover;
+  flex-shrink:0;
+}
+
+/* Footer del composer: hint sutil */
+.composer-footer{
+  text-align:center;
+  padding:0 12px 8px;
+}
+.composer-hint{
+  font-family:var(--sans);
+  font-size:11px;
+  color:var(--text-3);
+}
+
+/* Botón enviar */
+.btn-send{
+  display:flex; align-items:center; justify-content:center;
+  width:32px; height:32px;
+  border-radius:var(--radius-xs);
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  transition:var(--transition-fast);
+  box-shadow:0 1px 3px rgba(37,99,235,0.2);
+  flex-shrink:0;
+  margin-bottom:2px;
+}
+.btn-send:not(:disabled):hover{
+  background:var(--accent-dim);
+  transform:translateY(-1px);
+  box-shadow:0 3px 8px rgba(37,99,235,0.25);
+}
+.btn-send:disabled{ opacity:.35; cursor:not-allowed; background:var(--bg-3); color:var(--text-3); box-shadow:none; }
+
+/* Botón enviar en estado "detener generación" */
+.btn-send.is-stop{
+  background:var(--bg-1);
+  box-shadow:none;
+  cursor:pointer;
+  opacity:1;
+  position:relative;
+}
+.btn-send.is-stop:hover{ background:var(--bg-1); transform:none; }
+.btn-send.is-stop svg{ display:none; }
+.btn-send.is-stop::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  margin:auto;
+  width:26px; height:26px;
+  border-radius:50%;
+  border:2px solid var(--line-1);
+  border-top-color:var(--accent);
+  animation:spinStop .7s linear infinite;
+}
+.btn-send.is-stop::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  margin:auto;
+  width:10px; height:10px;
+  border-radius:50%;
+  background:#fff;
+  border:1px solid var(--line-1);
+}
+@keyframes spinStop{ to{ transform:rotate(360deg); } }
+

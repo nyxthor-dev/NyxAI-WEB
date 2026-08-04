@@ -1,0 +1,41 @@
+/* ============ TABLES ============ */
+.table-wrapper{
+  overflow-x:auto;
+  margin:0 0 16px;
+  border-radius:var(--radius-xs);
+  border:1px solid var(--line-1);
+  -webkit-overflow-scrolling:touch;
+}
+.table-wrapper::-webkit-scrollbar{ height:6px; }
+.table-wrapper::-webkit-scrollbar-thumb{ background:var(--line-2); border-radius:3px; }
+.md table{
+  border-collapse:collapse;
+  width:100%;
+  font-size:13px;
+  min-width:100%;
+}
+.md th, .md td{
+  border:1px solid var(--line-1);
+  padding:8px 12px;
+  text-align:left;
+  vertical-align:top;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  hyphens:auto;
+}
+.md th{
+  font-family:var(--sans);
+  background:var(--bg-2);
+  color:var(--text-0);
+  font-weight:600;
+  font-size:12px;
+  letter-spacing:0.02em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.md td{ background:var(--bg-0); color:var(--text-1); }
+.md tr:nth-child(even) td{ background:var(--bg-1); }
+.md tr:hover td{ background:var(--accent-soft); }
+.md hr{ border:none; border-top:1px solid var(--line-1); margin:20px 0; }
+.md img{ max-width:100%; border-radius:var(--radius-xs); }
+

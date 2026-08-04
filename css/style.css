@@ -1,0 +1,15 @@
+/* Punto de entrada: importa todos los módulos de estilos, en orden. */
+@import url("./base.css");
+@import url("./layout.css");
+@import url("./sidebar.css");
+@import url("./main-topbar.css");
+@import url("./chat-viewport.css");
+@import url("./messages.css");
+@import url("./reasoning.css");
+@import url("./markdown.css");
+@import url("./tables.css");
+@import url("./code-blocks.css");
+@import url("./composer.css");
+@import url("./message-actions.css");
+@import url("./modal.css");
+@import url("./responsive.css");
