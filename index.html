@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<title>Nykchat AI</title>
+<link rel="stylesheet" href="css/style.css">
+ <!-- Sintaxys -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/all.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- de lenguajes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <button class="btn-icon" id="toggleSidebar" title="Ocultar panel" aria-label="Ocultar panel">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/></svg>
+    </button>
+    <span class="brand">Nyk<span class="brand-accent">Chat</span></span>
+  </div>
+
+  <button class="btn-new-chat" id="newChatBtn">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Nuevo chat
+  </button>
+
+  <div class="sidebar-section-label">chats</div>
+  <div class="chat-list" id="chatList"></div>
+
+  <div class="sidebar-foot">
+    <button class="profile-btn" id="profileBtn">
+      <span class="profile-dot" id="profileDot"></span>
+      <span class="profile-info">
+        <span class="profile-name" id="profileName">sin conexión</span>
+        <span class="profile-sub" id="profileSub">configurar API</span>
+      </span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</aside>
+
+<div class="sidebar-scrim" id="sidebarScrim"></div>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+  <header class="topbar">
+    <button class="btn-icon" id="openSidebar" aria-label="Abrir panel">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+    <div class="model-select-wrap">
+      <button class="model-select" id="modelSelectBtn">
+        <span id="modelSelectLabel">deepseek-chat</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="model-dropdown" id="modelDropdown"></div>
+    </div>
+
+    <div class="topbar-right">
+      <span class="thread-badge" id="threadBadge" title="Sin hilo persistente todavía">
+        <span class="thread-dot"></span><span id="threadBadgeLabel">nuevo hilo</span>
+      </span>
+      <button class="btn-icon" id="clearChatBtn" title="Vaciar chat actual" aria-label="Vaciar chat">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="chat-viewport" id="chatViewport">
+    <div class="chat-scroll" id="chatScroll">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-glyph">&gt;_</div>
+        <h1>NykChat AI</h1>
+        <p>Conectado y listo. Escribe abajo para empezar.</p>
+      </div>
+      <div class="messages" id="messages"></div>
+    </div>
+  </section>
+
+  <footer class="composer-wrap">
+    <div class="attach-chips" id="attachChips"></div>
+    <form class="composer" id="composerForm">
+      <div class="composer-box" id="composerBox">
+        <div class="attach-wrap">
+          <button type="button" class="btn-attach" id="attachBtn" aria-label="Adjuntar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="attach-menu" id="attachMenu">
+            <button type="button" class="attach-option" data-action="camera">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>Cámara</span>
+            </button>
+            <button type="button" class="attach-option" data-action="image">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <span>Imagen</span>
+            </button>
+            <button type="button" class="attach-option" data-action="file">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+              <span>Archivos</span>
+            </button>
+          </div>
+        </div>
+
+        <textarea id="composerInput" class="composer-input" placeholder="Envía un mensaje..." rows="1"></textarea>
+
+        <button type="submit" class="btn-send" id="sendBtn" aria-label="Enviar" title="Enviar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        </button>
+      </div>
+      <div class="composer-footer">
+        <span class="composer-hint" id="composerHint">NykChat AI</span>
+      </div>
+    </form>
+
+    <input type="file" id="fileInputCamera" accept="image/*" capture="environment" style="display:none">
+    <input type="file" id="fileInputImage" accept="image/*" multiple style="display:none">
+    <input type="file" id="fileInputFile" multiple style="display:none">
+  </footer>
+</main>
+
+<!-- ============ MODAL: CONEXIÓN ============ -->
+<div class="modal-scrim" id="authScrim">
+  <div class="modal" id="authModal">
+    <div class="modal-head">
+      <span>Conexión a la API</span>
+      <button class="btn-icon" id="authCloseBtn" aria-label="Cerrar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label class="field-label" for="authUsername">Nombre de usuario</label>
+      <input type="text" id="authUsername" class="field-input" placeholder="ej. victor" autocomplete="off">
+
+      <label class="field-label" for="authBaseUrl">URL base de la API</label>
+      <input type="text" id="authBaseUrl" class="field-input" placeholder="https://tu-servidor.com" autocomplete="off">
+
+      <label class="field-label" for="authToken">API token</label>
+      <input type="password" id="authToken" class="field-input" placeholder="Bearer token" autocomplete="off">
+
+      <div class="field-row">
+        <button type="button" class="btn-ghost" id="authTestBtn">Probar conexión</button>
+        <span class="auth-status" id="authStatus"></span>
+      </div>
+
+      <div class="modal-divider"></div>
+      <div class="sidebar-section-label" style="padding:0 0 8px;">Perfiles guardados</div>
+      <div class="profile-list" id="profileList"></div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn-ghost" id="authDeleteBtn">Eliminar perfil</button>
+      <button type="button" class="btn-primary" id="authSaveBtn">Guardar y conectar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
