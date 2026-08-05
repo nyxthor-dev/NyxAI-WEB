@@ -18,6 +18,9 @@
   color:var(--text-3);
   text-transform:uppercase;
 }
+.code-head-actions{
+  display:flex; align-items:center; gap:4px;
+}
 .code-copy-btn{
   display:flex; align-items:center; gap:5px;
   padding:4px 10px;
@@ -33,6 +36,85 @@
 }
 .code-copy-btn:hover{ background:var(--bg-3); color:var(--text-0); }
 .code-copy-btn.copied{ color:var(--ok); }
+
+.code-preview-btn{
+  display:flex; align-items:center; gap:5px;
+  padding:4px 10px;
+  border-radius:4px;
+  color:var(--text-3);
+  font-family:var(--mono);
+  font-size:11px;
+  text-transform:none;
+  letter-spacing:0;
+  transition:var(--transition-fast);
+  border:none;
+  background:transparent;
+}
+.code-preview-btn:hover{ background:var(--accent-soft); color:var(--accent); }
+.code-preview-btn svg{ flex-shrink:0; }
+
+.code-preview{
+  display:flex;
+  flex-direction:column;
+  height:420px;
+  background:var(--bg-0);
+}
+.code-preview-toolbar{
+  flex-shrink:0;
+  display:flex; align-items:center; gap:4px;
+  padding:6px 8px 6px 14px;
+  background:var(--bg-2);
+  border-bottom:1px solid var(--line-1);
+}
+.code-preview-label{
+  flex:1;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.04em;
+  color:var(--text-3);
+  text-transform:uppercase;
+}
+.code-preview-refresh, .code-preview-close{
+  display:flex; align-items:center; justify-content:center;
+  width:24px; height:24px;
+  border-radius:4px;
+  color:var(--text-3);
+  border:none;
+  background:transparent;
+  transition:var(--transition-fast);
+}
+.code-preview-refresh:hover, .code-preview-close:hover{ background:var(--bg-3); color:var(--text-0); }
+.code-preview-frame-wrap{ flex:1; min-height:0; position:relative; }
+.code-preview-frame{
+  width:100%; height:100%;
+  border:none;
+  background:#fff;
+}
+.code-preview-src{ display:none; }
+
+/* Overlay de "generando HTML…" — visible mientras el mensaje sigue en
+   streaming, cubre el iframe (que todavía no cargó nada) para que quede
+   claro que la vista previa se completará sola apenas termine de
+   generarse el bloque, en vez de mostrar HTML a medio escribir. */
+.code-preview-loading{
+  display:none;
+  position:absolute; inset:0;
+  flex-direction:column; align-items:center; justify-content:center;
+  gap:10px;
+  background:var(--bg-0);
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--text-3);
+}
+.code-preview.loading .code-preview-loading{ display:flex; }
+.code-preview-loading .dot-flash{ display:inline-flex; gap:4px; }
+.code-preview-loading .dot-flash span{
+  width:5px; height:5px; border-radius:50%;
+  background:var(--accent);
+  animation:dotFlash 1.2s infinite;
+}
+.code-preview-loading .dot-flash span:nth-child(2){ animation-delay:.2s; }
+.code-preview-loading .dot-flash span:nth-child(3){ animation-delay:.4s; }
 
 .code-scroll{
   max-height:420px;
