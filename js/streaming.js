@@ -1,5 +1,5 @@
 import { messagesEl, emptyState, chatScroll, scrollState } from './dom.js';
-import { state, activeStreams, getChat, saveChats, createChat, updateChatTitleFromFirstMessage } from './state.js';
+import { state, activeStreams, getChat, saveChats, createChat, updateChatTitleFromFirstMessage, getSkill, buildSkillPrompt } from './state.js';
 import { escapeHtml, renderMarkdown } from './markdown.js';
 import { apiFetch, buildApiMessages, collectFileIdsFromMessages } from './api.js';
 import {
@@ -39,6 +39,8 @@ export async function sendMessage(text, attachments){
   renderMessages();
 
   const useThread = !!chat.apiSessionId;
+  const activeSkill = chat.activeSkillId ? getSkill(chat.activeSkillId) : null;
+  const skillPrompt = activeSkill ? buildSkillPrompt(activeSkill) : '';
   const body = {
     model: chat.model,
     stream: true,
@@ -53,15 +55,19 @@ export async function sendMessage(text, attachments){
   }
   if(useThread){
     // Hilo persistente del lado del servidor: solo se manda el mensaje
-    // nuevo, ligado a session_id/parent_message_id del chat.
+    // nuevo, ligado a session_id/parent_message_id del chat. Como el
+    // servidor ya tiene el historial y no admite un mensaje 'system'
+    // aparte en este modo, la skill activa se antepone al propio texto
+    // del turno.
     body.session_id = chat.apiSessionId;
     if(chat.apiParentMessageId != null) body.parent_message_id = chat.apiParentMessageId;
-    body.messages = [{ role: 'user', content: apiText }];
+    const turnText = skillPrompt ? `${skillPrompt}\n\n---\n\n${apiText}` : apiText;
+    body.messages = [{ role: 'user', content: turnText }];
   }else{
     // Sin hilo todavía (chat nuevo o antiguo): se manda el historial
     // completo como antes; la API abrirá sesión y devolverá los ids
     // para usarlos desde el siguiente turno.
-    body.messages = buildApiMessages({ messages: chat.messages.slice(0, -1) });
+    body.messages = buildApiMessages({ messages: chat.messages.slice(0, -1) }, skillPrompt);
     // Incluir también los file_id de adjuntos de turnos anteriores del
     // mismo historial, no solo los del mensaje que se está enviando ahora.
     const historicIds = collectFileIdsFromMessages(chat.messages.slice(0, -1));
@@ -152,12 +158,14 @@ export async function editMessage(chatId, msgIndex, newText, attachments){
   renderMessages();
 
   const canUseEditEndpoint = userMsg.apiMessageId != null && !!chat.apiSessionId;
+  const activeSkill = chat.activeSkillId ? getSkill(chat.activeSkillId) : null;
+  const skillPrompt = activeSkill ? buildSkillPrompt(activeSkill) : '';
 
   if(canUseEditEndpoint){
     const body = {
       session_id: chat.apiSessionId,
       message_id: userMsg.apiMessageId,
-      prompt: newText,
+      prompt: skillPrompt ? `${skillPrompt}\n\n---\n\n${newText}` : newText,
       search_enabled: true,
       thinking_enabled: /reason/i.test(chat.model || ''),
       stream: true,
@@ -173,7 +181,7 @@ export async function editMessage(chatId, msgIndex, newText, attachments){
       model: chat.model,
       stream: true,
       search_enabled: true,
-      messages: buildApiMessages({ messages: chat.messages.slice(0, -1) }),
+      messages: buildApiMessages({ messages: chat.messages.slice(0, -1) }, skillPrompt),
     };
     const allIds = [
       ...attachments.map(a => a.fileId),

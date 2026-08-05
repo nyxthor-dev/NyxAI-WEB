@@ -40,12 +40,44 @@ export const clearChatBtn = $('#clearChatBtn');
 export const threadBadge = $('#threadBadge');
 export const threadBadgeLabel = $('#threadBadgeLabel');
 
+export const openSearchBtn = $('#openSearchBtn');
+export const closeSearchBtn = $('#closeSearchBtn');
+export const searchOverlay = $('#searchOverlay');
+export const searchInput = $('#searchInput');
+export const searchResults = $('#searchResults');
+
+export const chatItemMenu = $('#chatItemMenu');
+export const chatMenuRename = $('#chatMenuRename');
+export const chatMenuPin = $('#chatMenuPin');
+export const chatMenuPinLabel = $('#chatMenuPinLabel');
+export const chatMenuDelete = $('#chatMenuDelete');
+
 export const attachBtn = $('#attachBtn');
 export const attachMenu = $('#attachMenu');
 export const attachChips = $('#attachChips');
+export const activeSkillChipWrap = $('#activeSkillChipWrap');
 export const fileInputCamera = $('#fileInputCamera');
 export const fileInputImage = $('#fileInputImage');
 export const fileInputFile = $('#fileInputFile');
+
+export const skillsBtn = $('#skillsBtn');
+export const skillsMenu = $('#skillsMenu');
+export const skillsMenuList = $('#skillsMenuList');
+export const skillsMenuForm = $('#skillsMenuForm');
+export const skillsSearchInput = $('#skillsSearchInput');
+export const skillsAddBtn = $('#skillsAddBtn');
+export const skillsList = $('#skillsList');
+export const skillsFormBack = $('#skillsFormBack');
+export const skillsFormTitle = $('#skillsFormTitle');
+export const skillNameInput = $('#skillNameInput');
+export const skillDescInput = $('#skillDescInput');
+export const skillContentInput = $('#skillContentInput');
+export const skillFormCancel = $('#skillFormCancel');
+export const skillFormSave = $('#skillFormSave');
+
+export const skillItemMenu = $('#skillItemMenu');
+export const skillMenuEdit = $('#skillMenuEdit');
+export const skillMenuDelete = $('#skillMenuDelete');
 
 export const authScrim = $('#authScrim');
 export const authUsername = $('#authUsername');

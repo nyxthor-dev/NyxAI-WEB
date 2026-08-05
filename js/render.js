@@ -4,14 +4,19 @@ import { saveChats } from './state.js';
 import { escapeHtml, renderMarkdown } from './markdown.js';
 import { regenerateMessage, continueMessage, switchVersion, editMessage, stopGeneration } from './streaming.js';
 import { updateComposerState } from './composer.js';
-import { closeSidebarMobile } from './sidebar.js';
 import { attachFileToEdit, removeEditAttachment } from './attachments.js';
+import { openChatItemMenu } from './chat-menu.js';
+import { renderActiveSkillChip } from './skills.js';
 
 // ============================================================
 // RENDER: sidebar chat list
 // ============================================================
 export function renderChatList(){
-  const ids = Object.keys(state.chats).sort((a,b) => state.chats[b].createdAt - state.chats[a].createdAt);
+  const ids = Object.keys(state.chats).sort((a,b) => {
+    const ca = state.chats[a], cb = state.chats[b];
+    if(!!cb.pinned !== !!ca.pinned) return (cb.pinned ? 1 : 0) - (ca.pinned ? 1 : 0);
+    return cb.createdAt - ca.createdAt;
+  });
   if(!ids.length){
     chatList.innerHTML = `<div class="sidebar-empty-hint">Sin sesiones todavía.<br>Crea un chat nuevo para empezar.</div>`;
     return;
@@ -19,29 +24,32 @@ export function renderChatList(){
   chatList.innerHTML = ids.map(id => {
     const c = state.chats[id];
     const active = id === state.activeChatId ? 'active' : '';
-    return `<div class="chat-item ${active}" data-id="${id}" tabindex="0">
+    const pinned = c.pinned ? 'pinned' : '';
+    return `<div class="chat-item ${active} ${pinned}" data-id="${id}" tabindex="0">
       <span class="chat-item-title">${escapeHtml(c.title)}</span>
-      <button class="chat-item-del" data-del="${id}" title="Eliminar" aria-label="Eliminar chat">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      <button class="chat-item-more" data-more="${id}" title="Más opciones" aria-label="Más opciones">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
       </button>
     </div>`;
   }).join('');
 
   chatList.querySelectorAll('.chat-item').forEach(el => {
     el.addEventListener('click', (e) => {
-      if(e.target.closest('[data-del]')) return;
+      if(e.target.closest('[data-more]')) return;
       scrollState.userScrolledUp = false;
       setActiveChat(el.dataset.id);
       renderChatList();
       renderMessages();
       updateComposerState();
-      closeSidebarMobile();
+      renderActiveSkillChip();
+      // Elegir un chat NUNCA colapsa ni cierra el panel — eso es
+      // exclusivo del botón de colapsar / tocar fuera (scrim).
     });
   });
-  chatList.querySelectorAll('[data-del]').forEach(el => {
+  chatList.querySelectorAll('[data-more]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
-      deleteChat(el.dataset.del);
+      openChatItemMenu(el.dataset.more, el);
     });
   });
 }

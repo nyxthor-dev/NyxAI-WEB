@@ -62,10 +62,14 @@ export function renderModelDropdown(){
   });
 }
 
-export function buildApiMessages(chat){
-  return chat.messages
+export function buildApiMessages(chat, systemPrompt){
+  const msgs = chat.messages
     .filter(m => !m.error || m.content)
     .map(m => ({ role: m.role, content: m.content }));
+  if(systemPrompt){
+    msgs.unshift({ role: 'system', content: systemPrompt });
+  }
+  return msgs;
 }
 
 // Recolecta todos los fileId de los adjuntos ya subidos en el historial

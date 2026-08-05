@@ -4,6 +4,7 @@ import { renderChatList, renderMessages } from './render.js';
 import { loadModels } from './api.js';
 import { updateComposerState } from './composer.js';
 import { updateProfileBadge, openAuthModal } from './auth.js';
+import { renderActiveSkillChip } from './skills.js';
 
 // Los siguientes módulos solo registran listeners en el DOM al importarse
 // (no exportan nada que se use aquí), pero deben cargarse para que la app
@@ -11,6 +12,8 @@ import { updateProfileBadge, openAuthModal } from './auth.js';
 import './sidebar.js';
 import './attachments.js';
 import './markdown.js';
+import './chat-menu.js';
+import './search.js';
 
 // ============================================================
 // INIT
@@ -22,6 +25,7 @@ function init(){
   renderChatList();
   renderMessages();
   updateComposerState();
+  renderActiveSkillChip();
   if(currentProfile()){
     loadModels();
   }else{
