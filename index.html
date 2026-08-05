@@ -19,10 +19,15 @@
 <!-- ============ SIDEBAR ============ -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-head">
-    <button class="btn-icon" id="toggleSidebar" title="Ocultar panel" aria-label="Ocultar panel">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/></svg>
-    </button>
     <span class="brand">Nyk<span class="brand-accent">Chat</span></span>
+    <div class="sidebar-head-actions">
+      <button class="btn-icon" id="openSearchBtn" title="Buscar chats" aria-label="Buscar chats">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="btn-icon" id="toggleSidebar" title="Ocultar panel" aria-label="Ocultar panel">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/></svg>
+      </button>
+    </div>
   </div>
 
   <button class="btn-new-chat" id="newChatBtn">
@@ -30,7 +35,7 @@
     Nuevo chat
   </button>
 
-  <div class="sidebar-section-label">chats</div>
+  <div class="sidebar-section-label" id="chatsSectionLabel">chats</div>
   <div class="chat-list" id="chatList"></div>
 
   <div class="sidebar-foot">
@@ -84,6 +89,7 @@
   </section>
 
   <footer class="composer-wrap">
+    <div class="active-skill-chip-wrap" id="activeSkillChipWrap"></div>
     <div class="attach-chips" id="attachChips"></div>
     <form class="composer" id="composerForm">
       <div class="composer-box" id="composerBox">
@@ -104,6 +110,42 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
               <span>Archivos</span>
             </button>
+          </div>
+        </div>
+
+        <div class="skills-wrap">
+          <button type="button" class="btn-attach" id="skillsBtn" aria-label="Skills" title="Skills">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <div class="skills-menu" id="skillsMenu">
+            <div class="skills-menu-list" id="skillsMenuList">
+              <div class="skills-search-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="skillsSearchInput" class="skills-search-input" placeholder="Buscar skills..." autocomplete="off">
+                <button type="button" class="btn-icon skills-add-btn" id="skillsAddBtn" aria-label="Crear skill" title="Crear skill">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+              </div>
+              <div class="skills-list" id="skillsList"></div>
+            </div>
+            <div class="skills-menu-form" id="skillsMenuForm">
+              <div class="skills-form-head">
+                <button type="button" class="btn-icon" id="skillsFormBack" aria-label="Volver">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <span id="skillsFormTitle">Nueva skill</span>
+              </div>
+              <label class="field-label" for="skillNameInput">Nombre</label>
+              <input type="text" id="skillNameInput" class="field-input" placeholder="ej. Revisor de código" autocomplete="off">
+              <label class="field-label" for="skillDescInput">Descripción</label>
+              <input type="text" id="skillDescInput" class="field-input" placeholder="Breve resumen de qué hace" autocomplete="off">
+              <label class="field-label" for="skillContentInput">Skill</label>
+              <textarea id="skillContentInput" class="field-input skills-content-textarea" placeholder="Instrucciones detalladas para esta skill..." rows="6"></textarea>
+              <div class="skills-form-actions">
+                <button type="button" class="btn-ghost" id="skillFormCancel">Cancelar</button>
+                <button type="button" class="btn-primary" id="skillFormSave">Guardar</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -157,6 +199,46 @@
       <button type="button" class="btn-primary" id="authSaveBtn">Guardar y conectar</button>
     </div>
   </div>
+</div>
+
+<!-- ============ BÚSQUEDA DE CHATS (pantalla completa) ============ -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-overlay-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="searchInput" class="search-overlay-input" placeholder="Buscar chats..." autocomplete="off">
+    <button class="btn-icon" id="closeSearchBtn" aria-label="Cerrar búsqueda">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="search-overlay-results" id="searchResults"></div>
+</div>
+
+<!-- ============ MENÚ CONTEXTUAL DE CHAT (···) ============ -->
+<div class="chat-menu" id="chatItemMenu">
+  <button type="button" class="chat-menu-item" id="chatMenuRename">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+    Renombrar
+  </button>
+  <button type="button" class="chat-menu-item" id="chatMenuPin">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+    <span id="chatMenuPinLabel">Fijar</span>
+  </button>
+  <button type="button" class="chat-menu-item chat-menu-item-danger" id="chatMenuDelete">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+    Eliminar
+  </button>
+</div>
+
+<!-- ============ MENÚ CONTEXTUAL DE SKILL (···) ============ -->
+<div class="chat-menu" id="skillItemMenu">
+  <button type="button" class="chat-menu-item" id="skillMenuEdit">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+    Editar
+  </button>
+  <button type="button" class="chat-menu-item chat-menu-item-danger" id="skillMenuDelete">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+    Eliminar
+  </button>
 </div>
 
 <script type="module" src="js/main.js"></script>
