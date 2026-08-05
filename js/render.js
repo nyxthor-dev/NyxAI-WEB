@@ -261,7 +261,7 @@ export function renderMessageHTML(m, idx){
     actionsHtml = `<div class="msg-actions">${copyBtnHtml}</div>`;
   }
 
-  return `<div class="msg assistant" data-idx="${idx}">
+  return `<div class="msg assistant ${isChatStreaming(state.activeChatId) ? 'msg-streaming' : ''}" data-idx="${idx}">
     <div class="msg-role"><span class="role-dot"></span>Nykchat</div>
     ${reasoningHtml}
     ${bodyHtml}

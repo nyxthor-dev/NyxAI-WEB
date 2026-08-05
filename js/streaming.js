@@ -1,6 +1,6 @@
 import { messagesEl, emptyState, chatScroll, scrollState } from './dom.js';
 import { state, activeStreams, getChat, saveChats, createChat, updateChatTitleFromFirstMessage, getSkill, buildSkillPrompt } from './state.js';
-import { escapeHtml, renderMarkdown } from './markdown.js';
+import { escapeHtml, renderMarkdown, updateMarkdownContent, loadPendingPreviews } from './markdown.js';
 import { apiFetch, buildApiMessages, collectFileIdsFromMessages } from './api.js';
 import {
   renderChatList, renderMessages, renderMessageHTML,
@@ -514,35 +514,7 @@ function _renderAssistantLiveImpl(idx, assistantMsg){
       }
     }else{
       const content = reasoningBlock.querySelector('.reasoning-content');
-      if(content){
-        // Igual que con los bloques de código del cuerpo del mensaje: se
-        // guarda la posición de scroll de cada .code-scroll interno del
-        // pensamiento antes de reemplazar el HTML, para no devolverlo a
-        // (0,0) en cada frame si el razonamiento incluye código.
-        // Se guarda tanto la posición como si estaba "pegado al fondo"
-        // de su propio mini-scroll — si el usuario no se alejó a
-        // propósito dentro del bloque, debe seguir mostrando las líneas
-        // nuevas a medida que se generan, igual que hace el chat con el
-        // fondo general. Si no, el bloque queda fijo mostrando siempre
-        // las primeras líneas mientras el código sigue creciendo.
-        const scrollPositions = Array.from(content.querySelectorAll('.code-scroll')).map(elx => ({
-          top: elx.scrollTop, left: elx.scrollLeft,
-          pinnedBottom: (elx.scrollHeight - elx.scrollTop - elx.clientHeight) < 24,
-        }));
-        content.innerHTML = renderMarkdown(assistantMsg.reasoning);
-        const newScrolls = content.querySelectorAll('.code-scroll');
-        scrollPositions.forEach((pos, i) => {
-          const target = newScrolls[i];
-          if(!target) return;
-          target.scrollLeft = pos.left;
-          target.scrollTop = pos.pinnedBottom ? target.scrollHeight : pos.top;
-        });
-        // Bloques de código nuevos (aparecidos en este frame, sin
-        // posición previa) arrancan pegados a su propio fondo.
-        for(let i = scrollPositions.length; i < newScrolls.length; i++){
-          newScrolls[i].scrollTop = newScrolls[i].scrollHeight;
-        }
-      }
+      if(content) updateMarkdownContent(content, assistantMsg.reasoning);
       const rStatus = reasoningBlock.querySelector('.r-status');
       if(rStatus) rStatus.textContent = assistantMsg.content ? '' : 'generando';
       if(!assistantMsg.content) reasoningBlock.classList.add('streaming');
@@ -562,34 +534,12 @@ function _renderAssistantLiveImpl(idx, assistantMsg){
       if(ref) ref.insertAdjacentHTML('afterend', `<div class="msg-body md">${renderMarkdown(assistantMsg.content)}</div>`);
       body = el.querySelector('.msg-body.md');
     }else{
-      // Antes de reemplazar el HTML (llega texto nuevo en cada frame),
-      // se guarda la posición de scroll de cada bloque de código —
-      // tanto vertical como horizontal — para restaurarla después.
-      // Sin esto, cada actualización recreaba los `.code-scroll` desde
-      // cero y el usuario no podía hacer scroll dentro de un bloque
-      // largo mientras la respuesta seguía generándose: el navegador lo
-      // devolvía a (0,0) varias veces por segundo.
-      //
-      // Además, si el bloque estaba pegado a su propio fondo (o es
-      // nuevo), se lo mantiene pegado al fondo tras la actualización —
-      // igual que el auto-scroll del chat general — para que un bloque
-      // de código largo "siga el ritmo" de la generación en vez de
-      // quedarse fijo mostrando las primeras líneas mientras crece.
-      const scrollPositions = Array.from(body.querySelectorAll('.code-scroll')).map(elx => ({
-        top: elx.scrollTop, left: elx.scrollLeft,
-        pinnedBottom: (elx.scrollHeight - elx.scrollTop - elx.clientHeight) < 24,
-      }));
-      body.innerHTML = renderMarkdown(assistantMsg.content);
-      const newScrolls = body.querySelectorAll('.code-scroll');
-      scrollPositions.forEach((pos, i) => {
-        const target = newScrolls[i];
-        if(!target) return;
-        target.scrollLeft = pos.left;
-        target.scrollTop = pos.pinnedBottom ? target.scrollHeight : pos.top;
-      });
-      for(let i = scrollPositions.length; i < newScrolls.length; i++){
-        newScrolls[i].scrollTop = newScrolls[i].scrollHeight;
-      }
+      // Preserva scroll y estado de vista previa de cada bloque de
+      // código entre actualizaciones de streaming — ver detalle en
+      // markdown.js:updateMarkdownContent. Sin esto, cada frame recreaba
+      // los `.code-scroll` desde cero (perdiendo el scroll manual del
+      // usuario) y cerraba cualquier vista previa HTML que tuviera abierta.
+      updateMarkdownContent(body, assistantMsg.content);
     }
   }else{
     if(!body && !el.querySelector('.msg-status')){
@@ -635,7 +585,33 @@ function finalizeAssistantMessage(chatId, msgIndex){
   const el = messagesEl.querySelector(`.msg.assistant[data-idx="${msgIndex}"]`);
   if(!el){ renderMessages(); return; }
 
+  // Si el usuario tenía alguna vista previa HTML abierta (mostrando el
+  // overlay de "generando" porque el mensaje aún no terminaba), se
+  // recuerda en qué posición estaba para reabrirla tras el re-render —
+  // los ids se regeneran en cada render, así que se empareja por orden
+  // dentro del mensaje, no por id. Y ahora sí se carga el iframe, porque
+  // el HTML ya está completo.
+  const previewBlocks = Array.from(el.querySelectorAll('.code-preview'));
+  const openPreviewIndexes = previewBlocks
+    .map((p, i) => (!p.hidden ? i : -1))
+    .filter(i => i !== -1);
+
   el.outerHTML = renderMessageHTML(msg, msgIndex);
   hydrateReasoningToggles();
   hydrateMessageActions();
+
+  if(openPreviewIndexes.length){
+    const newEl = messagesEl.querySelector(`.msg.assistant[data-idx="${msgIndex}"]`);
+    if(newEl){
+      const newPreviews = newEl.querySelectorAll('.code-preview');
+      openPreviewIndexes.forEach(i => {
+        const preview = newPreviews[i];
+        if(!preview) return;
+        const scroll = preview.closest('.code-block').querySelector('.code-scroll');
+        if(scroll) scroll.hidden = true;
+        preview.hidden = false;
+      });
+      loadPendingPreviews(newEl);
+    }
+  }
 }
