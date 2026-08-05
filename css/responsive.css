@@ -25,6 +25,8 @@
   .thread-badge .thread-dot{ width:8px; height:8px; }
   #threadBadgeLabel{ display:none; }
 
+  .token-counter{ padding:0 6px; height:20px; border:none; background:transparent; font-size:10px; }
+
   .sidebar-scrim{
     display:none;
     position:fixed; inset:0;

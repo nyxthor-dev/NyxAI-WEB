@@ -37,8 +37,7 @@
 .code-scroll{
   max-height:420px;
   overflow:auto;
-  overscroll-behavior:contain;
-  touch-action:pan-x pan-y;
+  overscroll-behavior:auto;
   -webkit-overflow-scrolling:touch;
 }
 .code-block pre{

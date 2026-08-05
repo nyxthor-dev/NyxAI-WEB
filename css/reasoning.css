@@ -42,12 +42,21 @@
   font-size:12px;
   line-height:1.7;
   color:var(--text-2);
-  white-space:pre-wrap;
   word-wrap:break-word;
   border-top:1px solid var(--line-1);
   margin-top:2px;
   padding-top:10px;
 }
+/* dentro del reasoning se usa la misma fuente mono y tamaño reducido,
+   markdown.css define tamaños/familia para .msg-body — se sobreescriben
+   aquí para que el pensamiento conserve su estilo visual distintivo */
+.reasoning-content.md p,
+.reasoning-content.md li{ font-size:12px; }
+.reasoning-content.md h1,
+.reasoning-content.md h2,
+.reasoning-content.md h3,
+.reasoning-content.md h4{ font-size:12px; margin:14px 0 8px; color:var(--text-1); }
+.reasoning-content.md pre{ font-size:11px; }
 .reasoning-block.open .reasoning-content{ display:block; }
 .reasoning-block.streaming .reasoning-toggle .r-status::after{
   content:'· generando';
