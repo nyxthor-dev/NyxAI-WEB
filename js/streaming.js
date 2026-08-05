@@ -501,7 +501,7 @@ function _renderAssistantLiveImpl(idx, assistantMsg){
           <span class="r-label">Razonamiento</span>
           <span class="r-status">${assistantMsg.content ? '' : 'generando'}</span>
         </button>
-        <div class="reasoning-content">${escapeHtml(assistantMsg.reasoning)}</div>
+        <div class="reasoning-content md">${renderMarkdown(assistantMsg.reasoning)}</div>
       </div>`;
       const role = el.querySelector('.msg-role');
       if(role) role.insertAdjacentHTML('afterend', reasoningHtml);
@@ -514,7 +514,35 @@ function _renderAssistantLiveImpl(idx, assistantMsg){
       }
     }else{
       const content = reasoningBlock.querySelector('.reasoning-content');
-      if(content) content.textContent = assistantMsg.reasoning;
+      if(content){
+        // Igual que con los bloques de código del cuerpo del mensaje: se
+        // guarda la posición de scroll de cada .code-scroll interno del
+        // pensamiento antes de reemplazar el HTML, para no devolverlo a
+        // (0,0) en cada frame si el razonamiento incluye código.
+        // Se guarda tanto la posición como si estaba "pegado al fondo"
+        // de su propio mini-scroll — si el usuario no se alejó a
+        // propósito dentro del bloque, debe seguir mostrando las líneas
+        // nuevas a medida que se generan, igual que hace el chat con el
+        // fondo general. Si no, el bloque queda fijo mostrando siempre
+        // las primeras líneas mientras el código sigue creciendo.
+        const scrollPositions = Array.from(content.querySelectorAll('.code-scroll')).map(elx => ({
+          top: elx.scrollTop, left: elx.scrollLeft,
+          pinnedBottom: (elx.scrollHeight - elx.scrollTop - elx.clientHeight) < 24,
+        }));
+        content.innerHTML = renderMarkdown(assistantMsg.reasoning);
+        const newScrolls = content.querySelectorAll('.code-scroll');
+        scrollPositions.forEach((pos, i) => {
+          const target = newScrolls[i];
+          if(!target) return;
+          target.scrollLeft = pos.left;
+          target.scrollTop = pos.pinnedBottom ? target.scrollHeight : pos.top;
+        });
+        // Bloques de código nuevos (aparecidos en este frame, sin
+        // posición previa) arrancan pegados a su propio fondo.
+        for(let i = scrollPositions.length; i < newScrolls.length; i++){
+          newScrolls[i].scrollTop = newScrolls[i].scrollHeight;
+        }
+      }
       const rStatus = reasoningBlock.querySelector('.r-status');
       if(rStatus) rStatus.textContent = assistantMsg.content ? '' : 'generando';
       if(!assistantMsg.content) reasoningBlock.classList.add('streaming');
@@ -541,15 +569,27 @@ function _renderAssistantLiveImpl(idx, assistantMsg){
       // cero y el usuario no podía hacer scroll dentro de un bloque
       // largo mientras la respuesta seguía generándose: el navegador lo
       // devolvía a (0,0) varias veces por segundo.
+      //
+      // Además, si el bloque estaba pegado a su propio fondo (o es
+      // nuevo), se lo mantiene pegado al fondo tras la actualización —
+      // igual que el auto-scroll del chat general — para que un bloque
+      // de código largo "siga el ritmo" de la generación en vez de
+      // quedarse fijo mostrando las primeras líneas mientras crece.
       const scrollPositions = Array.from(body.querySelectorAll('.code-scroll')).map(elx => ({
         top: elx.scrollTop, left: elx.scrollLeft,
+        pinnedBottom: (elx.scrollHeight - elx.scrollTop - elx.clientHeight) < 24,
       }));
       body.innerHTML = renderMarkdown(assistantMsg.content);
       const newScrolls = body.querySelectorAll('.code-scroll');
       scrollPositions.forEach((pos, i) => {
         const target = newScrolls[i];
-        if(target){ target.scrollTop = pos.top; target.scrollLeft = pos.left; }
+        if(!target) return;
+        target.scrollLeft = pos.left;
+        target.scrollTop = pos.pinnedBottom ? target.scrollHeight : pos.top;
       });
+      for(let i = scrollPositions.length; i < newScrolls.length; i++){
+        newScrolls[i].scrollTop = newScrolls[i].scrollHeight;
+      }
     }
   }else{
     if(!body && !el.querySelector('.msg-status')){
@@ -570,8 +610,10 @@ function _renderAssistantLiveImpl(idx, assistantMsg){
     errEl.remove();
   }
 
-  // Scroll inteligente: solo sigue el fondo si el usuario no se alejó a propósito
-  if(!scrollState.userScrolledUp){
+  // Scroll inteligente: solo sigue el fondo si el usuario no se alejó a
+  // propósito Y no tiene el dedo/rueda activos ahora mismo — si no, el
+  // auto-scroll pelea contra el gesto en curso y se siente "trabado".
+  if(!scrollState.userScrolledUp && !scrollState.userInteracting){
     const nearBottom = chatScroll.scrollHeight - chatScroll.scrollTop - chatScroll.clientHeight < 40;
     if(nearBottom){
       scrollState.autoScrolling = true;

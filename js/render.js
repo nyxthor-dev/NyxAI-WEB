@@ -1,4 +1,4 @@
-import { chatList, messagesEl, emptyState, chatScroll, threadBadge, threadBadgeLabel, scrollState } from './dom.js';
+import { chatList, messagesEl, emptyState, chatScroll, threadBadge, threadBadgeLabel, tokenCounter, tokenCounterLabel, scrollState } from './dom.js';
 import { state, getChat, setActiveChat, deleteChat, isChatStreaming } from './state.js';
 import { saveChats } from './state.js';
 import { escapeHtml, renderMarkdown } from './markdown.js';
@@ -85,6 +85,80 @@ export function updateThreadBadge(){
     threadBadgeLabel.textContent = 'nuevo hilo';
     threadBadge.title = 'Sin hilo persistente todavía — se abre con el primer mensaje';
   }
+  updateTokenCounter(chat);
+}
+
+// ============================================================
+// TOKEN COUNTER (simulado) — no llama a ningún tokenizer real, es una
+// estimación aproximada para dar una referencia visual rápida de cuánto
+// "pesa" la conversación actual. Se basa en:
+//  - palabras de texto (mensajes + pensamiento) → ~1.3 tokens/palabra,
+//    heurística estándar para texto en español con tokenizers BPE.
+//  - archivos adjuntos → estimado por su peso en bytes, ya que un
+//    archivo no es texto plano tokenizable 1:1 (imágenes/PDFs se
+//    codifican de forma mucho más cara que texto).
+function countWords(text){
+  if(!text) return 0;
+  const trimmed = text.trim();
+  if(!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
+}
+function estimateFileTokens(att){
+  const size = att && att.size ? att.size : 0;
+  if(!size) return 40; // archivo sin tamaño conocido: estimado mínimo
+  const isImage = att.type && att.type.startsWith('image/');
+  // Imágenes: ~85-170 tokens por "tile" de 512px es lo típico en modelos
+  // de visión; sin dimensiones reales, se aproxima por peso (imágenes
+  // más pesadas → más detalle → más tokens).
+  const bytesPerToken = isImage ? 90 : 4.2;
+  return Math.round(size / bytesPerToken);
+}
+export function estimateTokens(chat){
+  if(!chat || !chat.messages || !chat.messages.length){
+    return { total: 0, text: 0, thinking: 0, files: 0, words: 0, fileCount: 0, fileBytes: 0 };
+  }
+  let words = 0, thinkingWords = 0, fileTokens = 0, fileCount = 0, fileBytes = 0;
+  chat.messages.forEach(m => {
+    words += countWords(m.displayText || m.content);
+    if(m.reasoning) thinkingWords += countWords(m.reasoning);
+    if(m.attachments && m.attachments.length){
+      m.attachments.forEach(att => {
+        fileCount++;
+        fileBytes += (att.size || 0);
+        fileTokens += estimateFileTokens(att);
+      });
+    }
+  });
+  const textTokens = Math.round(words * 1.3);
+  const thinkingTokens = Math.round(thinkingWords * 1.3);
+  return {
+    total: textTokens + thinkingTokens + fileTokens,
+    text: textTokens, thinking: thinkingTokens, files: fileTokens,
+    words: words + thinkingWords, fileCount, fileBytes,
+  };
+}
+function formatTokenCount(n){
+  if(n < 1000) return n + '';
+  if(n < 10000) return (n / 1000).toFixed(1) + 'k';
+  return Math.round(n / 1000) + 'k';
+}
+function formatBytes(n){
+  if(n < 1024) return n + ' B';
+  if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+  return (n/(1024*1024)).toFixed(1) + ' MB';
+}
+export function updateTokenCounter(chat){
+  if(!tokenCounter) return;
+  chat = chat || getChat();
+  const est = estimateTokens(chat);
+  tokenCounterLabel.textContent = formatTokenCount(est.total) + ' tok';
+  const parts = [
+    `~${est.total} tokens estimados (simulado, no exacto)`,
+    `· texto: ${est.text} tok (${est.words - (est.thinking ? Math.round(est.thinking/1.3) : 0)} palabras aprox.)`,
+  ];
+  if(est.thinking) parts.push(`· pensamiento: ${est.thinking} tok`);
+  if(est.fileCount) parts.push(`· ${est.fileCount} archivo(s), ${formatBytes(est.fileBytes)} → ${est.files} tok`);
+  tokenCounter.title = parts.join(' ');
 }
 
 export function renderAttachChipsHTML(attachments){
@@ -131,7 +205,7 @@ export function renderMessageHTML(m, idx){
         <span class="r-label">Razonamiento</span>
         <span class="r-status"></span>
       </button>
-      <div class="reasoning-content">${escapeHtml(m.reasoning)}</div>
+      <div class="reasoning-content md">${renderMarkdown(m.reasoning)}</div>
     </div>`;
   }
   const bodyHtml = m.content

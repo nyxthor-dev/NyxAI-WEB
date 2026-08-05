@@ -1,6 +1,5 @@
-import { $, newChatBtn, clearChatBtn, modelSelectBtn, modelDropdown, openSearchBtn } from './dom.js';
-import { createChat, getChat, saveChats, currentChatStreaming } from './state.js';
-import { renderChatList, renderMessages, updateThreadBadge } from './render.js';
+import { $, newChatBtn, modelSelectBtn, modelDropdown, openSearchBtn } from './dom.js';
+import { createChat } from './state.js';
 import { updateComposerState } from './composer.js';
 import { openSearchOverlay } from './search.js';
 import { renderActiveSkillChip } from './skills.js';
@@ -23,20 +22,6 @@ export function closeSidebarMobile(){ document.body.classList.remove('sidebar-op
 newChatBtn.addEventListener('click', () => { createChat(); updateComposerState(); renderActiveSkillChip(); closeSidebarMobile(); });
 
 openSearchBtn.addEventListener('click', () => { openSearchOverlay(); });
-clearChatBtn.addEventListener('click', () => {
-  const chat = getChat();
-  if(!chat) return;
-  if(currentChatStreaming()) return;
-  if(!chat.messages.length) return;
-  chat.messages = [];
-  chat.title = 'Nuevo chat';
-  chat.apiSessionId = null;
-  chat.apiParentMessageId = null;
-  saveChats();
-  renderChatList();
-  renderMessages();
-  updateThreadBadge();
-});
 
 // ============================================================
 // MODEL DROPDOWN toggle
